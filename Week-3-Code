@@ -1,0 +1,85 @@
+import gym
+from gym import spaces
+import numpy as np
+import ai2thor.controller
+
+class RoboThorEnv(gym.Env):
+    def __init__(self, scene="FloorPlan_Train1_1"):
+        super(RoboThorEnv, self).__init__()
+        self.controller = ai2thor.controller.Controller()
+        self.controller.start()
+        self.controller.reset(scene)
+        
+        self.actions = ["MoveAhead", "RotateRight", "RotateLeft", "LookUp", "LookDown"]
+        self.action_space = spaces.Discrete(len(self.actions))
+        self.observation_space = spaces.Box(low=0, high=255, shape=(300, 300, 3), dtype=np.uint8)
+
+    def step(self, action):
+        action_name = self.actions[action]
+        event = self.controller.step(action=action_name)
+        done = event.metadata['lastActionSuccess'] is False
+        reward = 1.0 if not done else -1.0
+        obs = event.frame
+        return obs, reward, done, {}
+
+    def reset(self):
+        self.controller.reset("FloorPlan_Train1_1")
+        event = self.controller.step(action="Pass")
+        return event.frame
+
+    def render(self, mode='human'):
+        pass
+
+    def close(self):
+        self.controller.stop()
+
+
+
+
+
+
+# train_agent.py
+from stable_baselines3 import PPO
+from stable_baselines3.common.env_checker import check_env
+env = RoboThorEnv()
+check_env(env) # optional
+model = PPO("CnnPolicy", env, verbose=1)
+model.learn(total_timesteps=5000)
+model.save("ppo_robothor")
+
+/opt/anaconda3/lib/python3.12/site-packages/ai2thor/controller.py:1416: UserWarning: start method depreciated. The server started when the Controller was initialized.
+  warnings.warn(
+
+---------------------------------------------------------------------------
+FileExistsError                           Traceback (most recent call last)
+Cell In[16], line 4
+      2 from stable_baselines3 import PPO
+      3 from stable_baselines3.common.env_checker import check_env
+----> 4 env = RoboThorEnv()
+      5 check_env(env) # optional
+      6 model = PPO("CnnPolicy", env, verbose=1)
+
+Cell In[15], line 10, in RoboThorEnv.__init__(self, scene)
+      8 super(RoboThorEnv, self).__init__()
+      9 self.controller = ai2thor.controller.Controller()
+---> 10 self.controller.start()
+     11 self.controller.reset(scene)
+     13 self.actions = ["MoveAhead", "RotateRight", "RotateLeft", "LookUp", "LookDown"]
+
+File /opt/anaconda3/lib/python3.12/site-packages/ai2thor/controller.py:1428, in Controller.start(self, port, start_unity, width, height, x_display, host, player_screen_width, player_screen_height)
+   1424 env = os.environ.copy()
+   1426 image_name = None
+-> 1428 self.server.start()
+   1430 if start_unity:
+   1432     self._build.lock_sh()
+
+File /opt/anaconda3/lib/python3.12/site-packages/ai2thor/fifo_server.py:254, in FifoServer.start(self)
+    253 def start(self):
+--> 254     os.mkfifo(self.server_pipe_path)
+    255     os.mkfifo(self.client_pipe_path)
+    256     self.started = True
+
+FileExistsError: [Errno 17] File exists
+
+
+
