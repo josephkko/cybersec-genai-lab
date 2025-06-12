@@ -16,12 +16,6 @@ Real-time digital twins mirror physical robots and environments but introduce ne
 We are integrating models such as TIP (Trust Inference and Propagation) and ECT (Expectation Confirmation Trust) into a live knowledge graph, and using quantum optimization (QAOA) to guide trust-aware task allocation decisions. Our testbed simulates ROS-based multi-robot systems and evaluates system resilience under attack.
 
 ## Tools and Models Used
-- **Quantum Approximate Optimization Algorithm (QAOA)**  
-- **TIP Model** (Trust Inference and Propagation Model)  
-- **ECT Model** (Expectation Confirmation Trust Model)  
-- **Hugging Face Transformers** (for auxiliary text models or graph neural networks, if used)  
-- **ROS / Gazebo** (for robot twin simulation)  
-- **NetworkX** (for knowledge graph representation and updates)  
-- **Python** for overall system orchestration  
+
 
 ## Setup Instructions
